@@ -1,0 +1,39 @@
+{% extends 'wallet.html' %}
+
+{% block right %}
+
+{% endblock %}
+
+{% block table %}
+    <thead>
+        <tr>
+            <th>退款时间</th>
+            <th>退款金额</th>
+            <th>退款方式</th>
+            <th>订单号</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for result in results %}
+        <tr>
+            <td>{{ result.time|date:'Y-m-d H:i' }}</td>
+            <td>{{ result.order.cost }}</td>
+            <td>我的钱包</td>
+            <td>{{ result.order.id }}</td>
+        </tr>
+    {% empty %}
+        <tr class="text-center">
+            <td colspan="4">暂无记录！</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            $('a:contains("退款记录")').parent().addClass('active').siblings().removeClass('active')
+        })
+    </script>
+{% endblock %}

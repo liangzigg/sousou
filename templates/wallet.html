@@ -1,0 +1,144 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>我的钱包 - 嗖嗖</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="clearfix">
+            <ol role="navigation" aria-label="breadcrumbs" class="pull-left breadcrumb">
+                <li class="">
+                    <a href="/">首页</a>
+                </li>
+                <li class="active">
+                    <span>我的嗖嗖</span>
+                </li>
+                <li class="active">
+                    <span>钱包</span>
+                </li>
+            </ol>
+        </div>
+        <div class="card clearfix SettingsLayout__container___1mSoA">
+            <ul class="settings-nav nav nav-pills nav-stacked">
+                <li role="presentation" class="">
+                    <a href="{% url 'user:address' %}">地址簿</a>
+                </li>
+                <li role="presentation" class="active">
+                    <a href="{% url 'user:wallet' %}">钱包</a>
+                </li>
+            </ul>
+            <div class="SettingsLayout__content___3YcXb">
+                <div><div class="Balance__container___3cKe5">
+                    <span>账户余额：</span>
+                    <span class="Balance__value___3KSma">¥{{ user.balance }}</span>
+                </div>
+                    <div class="Action__container___3T7cs">
+                        <ul class="order-list-nav nav nav-pills">
+                            <li role="presentation" class="active">
+                                <a role="button" href="{% url 'user:wallet' %}">消费明细</a>
+                            </li>
+                            <li role="presentation" class="">
+                                <a role="button" href="{% url 'user:query_refund' %}">退款记录</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="DateRangePicker">
+                            <div>
+                                <div class="DateRangePickerInput">
+                                    <button type="button" class="DateRangePickerInput__calendar-icon"
+                                            aria-label="Interact with the calendar and add the
+                                            check-in date for your trip.">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1393.1 1500">
+                                            <path d="M107.2 1392.9h241.1v-241.1H107.2v241.1zm294.7 0h267.9v-241.1H401.9v241.1zm-294.7-294.7h241.1V830.4H107.2v267.8zm294.7 0h267.9V830.4H401.9v267.8zM107.2 776.8h241.1V535.7H107.2v241.1zm616.2 616.1h267.9v-241.1H723.4v241.1zM401.9 776.8h267.9V535.7H401.9v241.1zm642.9 616.1H1286v-241.1h-241.1v241.1zm-321.4-294.7h267.9V830.4H723.4v267.8zM428.7 375V133.9c0-7.3-2.7-13.5-8-18.8-5.3-5.3-11.6-8-18.8-8h-53.6c-7.3 0-13.5 2.7-18.8 8-5.3 5.3-8 11.6-8 18.8V375c0 7.3 2.7 13.5 8 18.8 5.3 5.3 11.6 8 18.8 8h53.6c7.3 0 13.5-2.7 18.8-8 5.3-5.3 8-11.5 8-18.8zm616.1 723.2H1286V830.4h-241.1v267.8zM723.4 776.8h267.9V535.7H723.4v241.1zm321.4 0H1286V535.7h-241.1v241.1zm26.8-401.8V133.9c0-7.3-2.7-13.5-8-18.8-5.3-5.3-11.6-8-18.8-8h-53.6c-7.3 0-13.5 2.7-18.8 8-5.3 5.3-8 11.6-8 18.8V375c0 7.3 2.7 13.5 8 18.8 5.3 5.3 11.6 8 18.8 8h53.6c7.3 0 13.5-2.7 18.8-8 5.4-5.3 8-11.5 8-18.8zm321.5-53.6v1071.4c0 29-10.6 54.1-31.8 75.3-21.2 21.2-46.3 31.8-75.3 31.8H107.2c-29 0-54.1-10.6-75.3-31.8C10.6 1447 0 1421.9 0 1392.9V321.4c0-29 10.6-54.1 31.8-75.3s46.3-31.8 75.3-31.8h107.2v-80.4c0-36.8 13.1-68.4 39.3-94.6S311.4 0 348.3 0h53.6c36.8 0 68.4 13.1 94.6 39.3 26.2 26.2 39.3 57.8 39.3 94.6v80.4h321.5v-80.4c0-36.8 13.1-68.4 39.3-94.6C922.9 13.1 954.4 0 991.3 0h53.6c36.8 0 68.4 13.1 94.6 39.3s39.3 57.8 39.3 94.6v80.4H1286c29 0 54.1 10.6 75.3 31.8 21.2 21.2 31.8 46.3 31.8 75.3z">
+
+                                            </path>
+                                        </svg>
+                                    </button>
+                                    <div class="DateInput DateInput--open-down">
+                                        <input type="text" aria-label="开始日期" class="DateInput__input needsclick"
+                                               id="startDate" name="startDate" value="2019-05-06" placeholder="开始日期"
+                                               autocomplete="off" aria-describedby="DateInput__screen-reader-message-startDate">
+                                        <p id="DateInput__screen-reader-message-startDate"
+                                           class="screen-reader-only">
+
+                                        </p>
+                                        <div class="DateInput__display-text
+                                        DateInput__display-text--has-input">
+                                            {{ user.create_time|date:'Y年m月d日' }}
+                                        </div>
+                                    </div>
+                                    <div class="DateRangePickerInput__arrow"
+                                         aria-hidden="true" role="presentation">
+                                        <svg viewBox="0 0 1000 1000">
+                                            <path d="M694.4 242.4l249.1 249.1c11 11 11 21 0 32L694.4 772.7c-5 5-10 7-16 7s-11-2-16-7c-11-11-11-21 0-32l210.1-210.1H67.1c-13 0-23-10-23-23s10-23 23-23h805.4L662.4 274.5c-21-21.1 11-53.1 32-32.1z">
+
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="DateInput DateInput--open-down">
+                                        <input type="text" aria-label="截止日期"
+                                               class="DateInput__input needsclick" id="endDate"
+                                               name="endDate" value="2019-05-12" placeholder="截止日期"
+                                               autocomplete="off" aria-describedby="DateInput__screen-reader-message-endDate">
+                                        <p id="DateInput__screen-reader-message-endDate" class="screen-reader-only">
+                                        </p>
+                                        <div class="DateInput__display-text
+                                        DateInput__display-text--has-input">
+                                            {{ today|date:'Y年m月d日' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% block right %}
+                            <div class="pull-right">
+                                <div class="Summary__container___1bneE">
+                                    <i class="fa fa-question-circle-o text-primary
+                                    Summary__mark___3m1xF">
+
+                                    </i>
+                                    <span>总消费：¥{{ total_consumption|floatformat:2 }}</span>
+                                </div>
+                            </div>
+                        {% endblock %}
+                    </div>
+                    <table class="Record__table___1L6Lm table table-bordered">
+                    {% block table %}
+                        <thead>
+                        <tr>
+                            <th>下单时间</th>
+                            <th>支付金额</th>
+                            <th>支付方式</th>
+                            <th>订单号</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in order_list %}
+                            <tr>
+                                <td>{{ order.create_time|date:'Y-m-d H:i' }}</td>
+                                <td>{{ order.cost }}</td>
+                                <td>{{ order.get_payment_method_display }}</td>
+                                <td>{{ order.id }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr class="text-center">
+                                <td colspan="4">暂无记录！</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    {% endblock %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+        })
+    </script>
+{% endblock %}

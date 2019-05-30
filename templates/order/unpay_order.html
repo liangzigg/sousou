@@ -1,0 +1,145 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>我的订单 - 嗖嗖</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <script>
+            $(function () {
+                $('ul.acc a:contains("我的订单")').parent().addClass('active')
+                    .siblings().removeClass('active');
+                $('ol li').addClass('active')
+            })
+        </script>
+        <div class="clearfix">
+            <ol role="navigation" aria-label="breadcrumbs" class="breadcrumb">
+                <li class="">
+                    <a href="{% url 'index' %}">首页</a>
+                </li>
+                <li class="active">
+                    <span>我的订单</span>
+                </li>
+            </ol>
+        </div>
+        <div class="card">
+            <div class="clearfix Action__container___3Tg-d">
+                <div class="pull-left clearfix">
+                    <ul class="order-list-nav pull-right nav nav-pills">
+                        <li role="presentation" class="active">
+                            <a role="button" href="{% url 'order:unpay_order' %}">待支付</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="{% url 'order:unpack_order' %}">待接单</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="{% url 'order:untoken_order' %}">待取货</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="{% url 'order:distribution_order' %}">配送中</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="{% url 'order:finished_order' %}">已完成</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="{% url 'order:cancel_order' %}">已取消</a>
+                        </li>
+                    </ul>
+                </div>
+                <form class="pull-right form-inline">
+                    <div class="form-group">
+                        <input type="text" placeholder="收货人姓名或手机号" value=""
+                               class="Action__search-input___K639D form-control">
+                    </div>
+                    <button type="submit" class="Action__search-button___4obHi btn btn-primary">
+                        搜索
+                    </button>
+                </form>
+            </div>
+            <table class="OrderList__table___3UjSJ table table-bordered">
+                <thead>
+                <tr>
+                    <th style="width:145px">订单号</th>
+                    <th class="OrderList__row-contact___3Ds33">发货人｜收货人</th>
+                    <th>备注</th>
+                    <th>支付金额</th>
+                    <th style="width: 120px;">嗖嗖骑士</th>
+                    <th style="width:127px">下单时间</th>
+                    <th style="width: 120px;">状态｜操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in order_list %}
+                    <tr id="{{ order.id }}">
+                        <td>
+                            <a href="">{{ order.id }}</a>
+                            <div>
+                                <div>嗖嗖</div>
+                                <div></div>
+                            </div>
+                        </td>
+                        <td class="OrderList__contact___wTzSG">
+                            <div>发货人：{{ order.sender_addr.recv_name }} {{ order.sender_addr.liaison }}</div>
+                            <div class="OrderList__contact-address___1b-4O">
+                                {{ order.sender_addr.address_detailed }}
+                            </div>
+                            <div>收货人：{{ order.recv_addr.recv_name }} {{ order.recv_addr.liaison }}</div>
+                            <div class="OrderList__contact-address___1b-4O">
+                                {{ order.recv_addr.address_detailed }}
+                            </div>
+                        </td>
+                        <td>{{ order.demo|default:'无' }}</td>
+                        <td class="text-danger">¥{{ order.cost }}</td>
+                        <td>
+                            <div>{{ order.driver }}</div>
+                        </td>
+                        <td>{{ order.create_time|date:'Y-m-d H:i' }}</td>
+                        <td>
+                            {% block operate %}
+                                <p>待支付</p>
+                                <p>
+                                    <button type="button" class="btn btn-primary">去支付</button>
+                                </p>
+                            {% endblock %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="OrderList__no-orders___1j8wZ">暂无相关订单！</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $('button:contains("去支付")').click(function () {
+            var oid = $(this).parent().parent().parent().attr('id');
+            $.post('{% url "order:unpay_order" %}',
+                {'csrfmiddlewaretoken': '{{ csrf_token }}', 'oid': oid},
+                function (data) {
+                    if (data['status']){
+                        window.open(data['msg']);
+                        $.post('{% url "order:check_pay" %}',
+                            {"csrfmiddlewaretoken": "{{ csrf_token }}", "oid": oid},
+                            function (result) {
+                                if(result['status']){
+                                    window.location.href = '{% url "order:unpack_order" %}'
+                                }else{
+                                    alert(result['msg'])
+                                }
+                            }
+                        )
+                    }else{
+                        alert(data['msg'])
+                    }
+                }
+            )
+        })
+    </script>
+{% endblock %}

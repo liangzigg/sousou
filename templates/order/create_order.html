@@ -1,0 +1,575 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>在线下单 - 嗖嗖</title>
+{% endblock %}
+
+{% block content %}
+    <script>
+        $(function () {
+            $('a:contains("在线下单")').parent().addClass('active')
+                .siblings().removeClass('active');
+            get_address = function (ths, atype){
+                $(ths).parent().children('ul').children('li').remove();
+                $.get(
+                    '{% url "user:address_query" %}',
+                    {'type': atype},
+                    function (data) {
+                        if (data['status'] === '2'){
+                            $(data['address_list']).each(function (i, ele) {
+                                let li_ele = '<li class="address" id="'+ ele.id +'"><a href="javascript:void(0)">' + ele.address_detailed + '</a></li>';
+                                $(ths).parent().children('ul').append(li_ele)
+                            })
+                        }else{
+                            let li_ele = '<li><a href="">暂无地址</a></li>';
+                            $(ths).parent().children('ul').append(li_ele)
+                        }
+                    }
+                );
+                return true
+            }
+        })
+    </script>
+    <div class="container">
+        <div role="alert" class="Notification__container___2Vq4o alert alert-warning">
+            欢迎使用嗖嗖速达，在线下单，上门取件。
+            <a href="#" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+        <div class="clearfix">
+            <ol role="navigation" aria-label="breadcrumbs" class="pull-left breadcrumb">
+                <li class="">
+                    <a href="/">首页</a>
+                </li>
+                <li class="active">
+                    <span>在线下单（个人版）</span>
+                </li>
+            </ol>
+            <div class="clearfix">
+                <div class="City__city____9_sg">
+                    <span>当前城市：太原市</span>
+                    <span class="City__city-selector___1Rmpt">[ 切换城市 ]</span>
+                </div>
+            </div>
+        </div>
+        <form class="form-horizontal">
+            <input type="hidden" value="" name="sender_position" id="sender_position">
+            <input type="hidden" value="" name="receiver_position" id="receiver_position">
+            <div>
+                <div class="send card card-form">
+                    <div class="row form-group">
+                        <label for="sender-number" class="text-right col-xs-2 control-label">
+                            发货地址
+                        </label>
+                        <div class="col-xs-10">
+                            <div class="input-group">
+                                <input type="text" name="sender_address" id="sender-address"
+                                       class="form-control" placeholder="" required>
+                                <div class="input-group-btn">
+                                    <button id="get-send" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false" onclick="get_address(this,0)">
+                                        地址簿
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="send dropdown-menu dropdown-menu-right" style="width: 326px;">
+                                        <li><a href="#">暂无地址</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-number" class="text-right col-xs-2 control-label">
+                            门牌号
+                        </label>
+                        <div class="col-xs-10">
+                            <input type="text" placeholder="请填写具体楼号和门牌号" name="sender_door" value=""
+                                   id="sender-number" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-name" class="text-right col-xs-2 control-label">
+                            发货人姓名
+                        </label>
+                        <div class="col-xs-5">
+                            <input type="text" placeholder="请填写发货人姓名" name="sender_name"
+                                   value="" id="sender-name" class="form-control" maxlength="5" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-phone" class="text-right col-xs-2 control-label">
+                            发货人电话
+                        </label>
+                        <div class="col-xs-10">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <input type="text" placeholder="请填写发货人电话" name="sender_phone"
+                                           value="" id="sender-phone" class="form-control" maxlength="11"
+                                           minlength="11" required>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Contact__phone-line___1dzul Contact__col-xs-1___1cp4H col-xs-1">
+                                        _
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="no-margin form-group">
+                        <div class="col-xs-10 col-xs-offset-2">
+                            <div class="Contact__save___1wp4j checkbox">
+                                <label title="">
+                                    <input type="checkbox" value="on" name="save_send">保存为常用发货地址
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card card-form recv">
+                    <div class="row form-group">
+                        <label for="receiver-address" class="text-right col-xs-2 control-label">
+                            收货地址
+                        </label>
+                        <div class="col-xs-10">
+                            <div class="input-group">
+                                <input type="text" name="receiver_address" id="receiver-address"
+                                       class="form-control" placeholder="" required>
+                                <div class="input-group-btn">
+                                    <button id="get-recv" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false" onclick="get_address(this,1)">
+                                        地址簿
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="recv dropdown-menu dropdown-menu-right" style="width: 326px;">
+                                        <li><a href="#">暂无地址</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiver-number" class="text-right col-xs-2 control-label">
+                            门牌号
+                        </label>
+                        <div class="col-xs-10">
+                            <input type="text" placeholder="请填写具体楼号和门牌号" name="receiver_door" value=""
+                                   id="receiver-number" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiver-name" class="text-right col-xs-2 control-label">
+                            收货人姓名
+                        </label>
+                        <div class="col-xs-5">
+                            <input type="text" placeholder="请填写收货人姓名" name="receiver_name" value=""
+                                   id="receiver-name" class="form-control" maxlength="5" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiver-phone" class="text-right col-xs-2 control-label">
+                            收货人电话
+                        </label>
+                        <div class="col-xs-10">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <input type="text" placeholder="请填写收货人电话"
+                                           name="receiver_phone" value="" id="receiver-phone"
+                                           class="form-control" maxlength="11" minlength="11" required>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Contact__phone-line___1dzul Contact__col-xs-1___1cp4H col-xs-1">
+                                        _
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="no-margin form-group">
+                        <div class="col-xs-10 col-xs-offset-2">
+                            <div class="Contact__save___1wp4j checkbox">
+                                <label title="">
+                                    <input type="checkbox" value="on" name="save_recv">
+                                    保存为常用收货地址
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-form">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">
+                        物品类型
+                    </label>
+                    <div class="col-xs-10">
+                        <div id="goods-type">
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                食品饮料
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                鲜花
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                蛋糕
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                文件
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                水果生鲜
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                证照证件
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                数码家电
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                服饰鞋帽
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                其他
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">
+                        物品价值
+                    </label>
+                    <div class="col-xs-10">
+                        <div id="goods-value">
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                50元以下
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                50~100元
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                100~500元
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                500~1000元
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                1000~5000元
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary InlineSelect__option___31IyL">
+                                5000~10000元
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">
+                        物品重量
+                    </label>
+                    <div class="col-xs-10">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <span class="Counter__container___3E6Vl input-group">
+                                    <span class="input-group-btn">
+                                        <button type="button" id="sub"
+                                                class="no-margin Counter__button___23JKf btn btn-default">
+                                            -
+                                        </button>
+                                    </span>
+                                    <input value="1" class="no-margin text-center Counter__input___2dt_2
+                                    form-control" name="weight">
+                                    <span class="input-group-btn">
+                                        <button type="button" id="add" class="no-margin Counter__button___23JKf btn
+                                         btn-default">
+                                            +
+                                        </button>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="Box__counter-description___TTJ3p">
+                                    5公斤以内不加价（最高15公斤）
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">
+                        备注信息
+                    </label>
+                    <div class="col-xs-10">
+                        <textarea rows="3" maxlength="50" name="demo" placeholder="填写备注信息（50个字以内）"
+                                  class="form-control">
+
+                        </textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-lg btn-primary"
+                        style="margin-bottom: 30px; width: 200px;">
+                    下一步
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('ul.dropdown-menu-right').on('click', 'li.address a', function () {
+                var aid = $(this).parent().attr('id');
+                $.get('{% url "user:address_query" %}', {'aid': aid},function (data) {
+                        if (data['status']==='4'){
+                            var ainfo = data['msg'][0];
+                            if(ainfo.address_type){
+                                $('input[name=receiver_address]').val(ainfo.address_detailed);
+                                $('input[name=receiver_door]').val(ainfo.address_number);
+                                $('input[name=receiver_name]').val(ainfo.recv_name);
+                                $('input[name=receiver_phone]').val(ainfo.liaison);
+                                $('input[name=receiver_position]').val(ainfo.address_longitude+','+ainfo.address_latitude);
+                            }else{
+                                $('input[name=sender_address]').val(ainfo.address_detailed);
+                                $('input[name=sender_door]').val(ainfo.address_number);
+                                $('input[name=sender_name]').val(ainfo.recv_name);
+                                $('input[name=sender_phone]').val(ainfo.liaison);
+                                $('input[name=sender_position]').val(ainfo.address_longitude+','+ainfo.address_latitude);
+                            }
+                        }
+                    }
+                )
+            });
+            $('button.InlineSelect__option___31IyL').click(function () {  // 选择货物类型
+                $(this).parent().children('button').removeClass('btn-primary')
+                    .removeClass('btn-outline-secondary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('btn-primary')
+            });
+            $('#sub').click(function () {  // 减少重量
+                $('#add').removeAttr('disabled');
+                var goods_weight = $(this).parent().next().val();
+                var ele = $(this).parent().next();
+                if (goods_weight == 1) {
+                    $(this).attr('disabled', 'true');
+                    return
+                }
+                ele.val(parseInt(goods_weight) - 1)
+            });
+            $('#add').click(function () {  // 增加重量
+                $('#sub').removeAttr('disabled');
+                var goods_weight = $(this).parent().prev().val();
+                var ele = $(this).parent().prev();
+                if (goods_weight == 15) {
+                    $(this).attr('disabled', 'true');
+                    return
+                }
+                ele.val(parseInt(goods_weight) + 1)
+            });
+            $('input[name=weight]').blur(function () {  //检查重量输入框
+                var gweight = $(this).val();
+                if (!/\d+/.test(gweight) || gweight < 1) {
+                    $(this).val(1)
+                } else if (gweight > 15) {
+                    $(this).val(15)
+                }
+            });  // 重量输入款被改变时
+            sa = $('input[name=sender_address]');
+            ra = $('input[name=receiver_address]');
+            sa_name = $('input[name=sender_name]');
+            ra_name = $('input[name=receiver_name]');
+            sa_phone = $('input[name=sender_phone]');
+            ra_phone = $('input[name=receiver_phone]');
+
+            function check_sa_address() {
+                if (sa.val().trim().length < 4) {
+                    sa.parent().parent().append('<span class="help-block help-span" id="help-sa">请填写详细发货地址</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_ra_address() {
+                if (ra.val().trim().length < 4) {
+                    ra.parent().parent().append('<span class="help-block help-span" id="help-ra">请填写详细收货地址</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_sa_phone() {
+                if (sa_phone.val().length !== 11 || !/^1[3578]\d{9}/.test(sa_phone.val())) {
+                    sa_phone.parent().append('<span class="help-block help-span" id="help-sa-phone">手机号码格式不正确</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_ra_phone() {
+                if (ra_phone.val().length !== 11 || !/^1[3578]\d{9}/.test(ra_phone.val())) {
+                    ra_phone.parent().append('<span class="help-block help-span" id="help-ra-phone">手机号码格式不正确</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_sa_name() {
+                if (sa_name.val().trim().length < 2) {
+                    sa_name.parent().append('<span class="help-block help-span" id="help-sa-name">请填写发货人姓名</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_ra_name() {
+                if (ra_name.val().trim().length < 2) {
+                    ra_name.parent().append('<span class="help-block help-span" id="help-ra-name">请填写收货人姓名</span>')
+                    return false
+                }
+                return true
+            }
+
+            sa.blur(check_sa_address);
+            ra.blur(check_ra_address);
+            sa_phone.blur(check_sa_phone);
+            ra_phone.blur(check_ra_phone);
+            sa_name.blur(check_sa_name);
+            ra_name.blur(check_ra_name);
+
+            sa.bind('input propertychange', function (event) {
+                $('.sender_add').remove();
+                $.get(
+                    'https://restapi.amap.com/v3/assistant/inputtips',
+                    {
+                        's': 'rsv3',
+                        'key': 'd547a35bb5714ca96791a74b42e3cd37',
+                        'city': 140108,
+                        'citylimit': true,
+                        'platform': 'JS',
+                        'logversion': 2.0,
+                        'appname': 'https://kuai.imdada.cn/order/create?channel=baidusem&e_keyword=bdp033746&express=hour&vistormark=baidu&vistorsource=tuiguang',
+                        'sdkversion': '1.4.8',
+                        'keywords': sa.val()
+                    }, function (tips) {
+                        if (tips['count'] !== '0') {
+                            data = tips;
+                            selector = $('<div id="ssmo" class="select-menu-outer sender_add"></div>');
+                            selector_inside = $('<select style="width:453px;" id="sender_a"></select>');
+                            let init = '<option>请选择</option>';
+                            selector_inside.append(init);
+                            $(data['tips']).each(function (index, ele) {
+                                plain = '<option value="' + ele['location'] + '">' + ele['name'] + ' ' + ele['address'] + '</option>';
+                                selector_inside.append(plain)
+                            });
+                            selector.append(selector_inside);
+                            sa.parent().parent().append(selector);
+                            $('#sender_a').change(function () {
+                                let choice = $(this).children('option:selected').text();
+                                $('#sender_position').val($(this).children('option:selected').val());
+                                sa.val(choice);
+                                $('.sender_add').remove();
+                            });
+                        }
+                    }
+                )
+            });
+            ra.bind('input propertychange', function (event) {
+                $('.receiver_add').remove();
+                $.get(
+                    'https://restapi.amap.com/v3/assistant/inputtips',
+                    {
+                        's': 'rsv3',
+                        'key': 'd547a35bb5714ca96791a74b42e3cd37',
+                        'city': 140108,
+                        'citylimit': true,
+                        'platform': 'JS',
+                        'logversion': 2.0,
+                        'appname': 'https://kuai.imdada.cn/order/create?channel=baidusem&e_keyword=bdp033746&express=hour&vistormark=baidu&vistorsource=tuiguang',
+                        'sdkversion': '1.4.8',
+                        'keywords': ra.val()
+                    }, function (tips) {
+                        if (tips['count'] !== '0') {
+                            data = tips;
+                            selector = $('<div id="rsmo" class="select-menu-outer receiver_add"></div>');
+                            selector_inside = $('<select style="width:453px;" id="receiver_a"></select>');
+                            let init = '<option>请选择</option>';
+                            selector_inside.append(init);
+                            $(data['tips']).each(function (index, ele) {
+                                plain = '<option value="' + ele['location'] + '">' + ele['name'] + ' ' + ele['address'] + '</option>';
+                                selector_inside.append(plain)
+                            });
+                            selector.append(selector_inside);
+                            ra.parent().parent().append(selector);
+                            $('#receiver_a').change(function () {
+                                let choice = $(this).children('option:selected').text();
+                                ra.val(choice);
+                                $('#receiver_position').val($(this).children('option:selected').val());
+                                $('.receiver_add').remove();
+                            });
+                        }
+                    }
+                )
+            });
+            sa.focus(function () {
+                $('#help-sa').remove()
+            });
+            ra.focus(function () {
+                $('#help-ra').remove()
+            });
+            sa_phone.focus(function () {
+                $('#help-sa-phone').remove()
+            });
+            ra_phone.focus(function () {
+                $('#help-ra-phone').remove()
+            });
+            sa_name.focus(function () {
+                $('#help-sa-name').remove()
+            });
+            ra_name.focus(function () {
+                $('#help-ra-name').remove()
+            });
+
+            function check_type() {
+                if (!$('#goods-type button').hasClass('btn-primary')) {
+                    $('#goods-type').parent()
+                        .append('<span class="help-block help-span" id="goods-tp-help">请选择物品类型</span>')
+                    return false
+                }
+                return true
+            }
+
+            function check_value() {
+                if (!$('#goods-value button').hasClass('btn-primary')) {
+                    $('#goods-value').parent()
+                        .append('<span class="help-block help-span" id="goods-vl-help">请选择物品价值</span>')
+                    return false
+                }
+                return true
+            }
+
+            $('button:contains("下一步")').click(function () {
+                $('span.help-span').remove();
+                if (!(check_type() || check_value() || check_ra_name() || check_sa_name() || check_ra_address() || check_sa_address() || check_ra_phone() || check_sa_phone())) {
+                    return
+                }
+                if ($('input[name=sender_phone]').val() === $('input[name=receiver_phone]').val()){
+                    alert('收货人联系方式和发货人联系方式不可相同!');
+                    return
+                }
+                let data = $('form.form-horizontal').serialize();
+                let gtype = $('#goods-type button.btn-primary').text().trim();
+                let gvalue = $('#goods-value button.btn-primary').text().trim();
+                $.post(
+                    '{% url "order:confirm_order" %}',
+                    data + '&gtype=' + gtype + '&gvalue=' + gvalue + '&csrfmiddlewaretoken=' + '{{ csrf_token }}',
+                    function (data, status) {
+                        if (data['status']) {
+                            window.location.href = '{% url "order:confirm_order" %}'
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                )
+            });
+        })
+    </script>
+{% endblock %}

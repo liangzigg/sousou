@@ -1,0 +1,88 @@
+{% extends 'backstage/index.html' %}
+
+{% block container %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">用户管理</a>
+        </li>
+        <li class="breadcrumb-item active">普通用户</li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-table"></i>
+            用户列表
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>用户身份</th>
+                        <th>最后登录时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>用户身份</th>
+                        <th>最后登录时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for user in users %}
+                        <tr id="{{ user.id }}">
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.get_user_status_display }}</td>
+                            <td>{{ user.last_login }}</td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="change_status(this,'升权')">升权</a>|
+                                <a href="javascript:void(0);" onclick="change_status(this,'删除')">删除</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted">更新于{{ now|date:'Y-m-d H:i' }}</div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        function get_user_info(ths) {
+            let uid = $(ths).parent().parent().attr('id');
+            let username = $(ths).parent().parent().children('td:eq(1)').text();
+            let identity = $(ths).parent().parent().children('td:eq(3)').text();
+            return [uid,username,identity]
+        }
+        function change_status(ths, opera) {
+            let user = get_user_info(ths);
+            let answer = confirm('确定将' + user[2] + ' ' + user[1] + '进行' + opera + '操作吗?');
+            if (answer) {
+                $.post(
+                    '{% url "backstage:administrators" %}',
+                    {"csrfmiddlewaretoken": "{{ csrf_token }}", "uid": user[0], "type": opera},
+                    function (data) {
+                        alert(data['msg']);
+                        if (data['status']) {
+                            window.location.reload()
+                        }
+                    }
+                )
+            }
+        }
+        $('#user-manage').removeClass('collapsed');
+        $('#collapseComponents').addClass('show');
+    </script>
+{% endblock %}

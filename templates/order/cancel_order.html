@@ -1,0 +1,15 @@
+{% extends 'order/unpay_order.html' %}
+
+{% block operate %}
+    <p>已取消</p>
+    <p>
+    </p>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('a:contains("已取消")').parent().addClass('active').siblings().removeClass('active')
+        })
+    </script>
+{% endblock %}

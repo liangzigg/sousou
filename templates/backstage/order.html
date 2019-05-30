@@ -1,0 +1,134 @@
+{% extends 'backstage/index.html' %}
+{% load static %}
+
+{% block css %}
+    <style>
+        th {
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+{% endblock %}
+
+{% block container %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">订单管理</a>
+        </li>
+        <li class="breadcrumb-item active">
+            {% if ostatus == '0' %}
+                待支付
+            {% elif ostatus == '1' %}
+                待接单
+            {% elif ostatus == '2' %}
+                待取货
+            {% elif ostatus == '3' %}
+                配送中
+            {% elif ostatus == '4' %}
+                已完成
+            {% elif ostatus == '5' %}
+                已取消
+            {% endif %}
+        </li>
+    </ol>
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-table"></i>
+            订单列表
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>订单ID</th>
+                        <th>收货人|发货人</th>
+                        <th>备注</th>
+                        <th>支付金额</th>
+                        <th>下单时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>订单ID</th>
+                        <th>收货人|发货人</th>
+                        <th>备注</th>
+                        <th>支付金额</th>
+                        <th>下单时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for order in orders %}
+                        <tr id="{{ order.id }}">
+                            <td>{{ order.id }}</td>
+                            <td class="OrderList__contact___wTzSG">
+                                <div>发货人：{{ order.sender_addr.recv_name }} {{ order.sender_addr.liaison }}</div>
+                                <div class="OrderList__contact-address___1b-4O">
+                                    {{ order.sender_addr.address_detailed }}
+                                </div>
+                                <div>收货人：{{ order.recv_addr.recv_name }} {{ order.recv_addr.liaison }}</div>
+                                <div class="OrderList__contact-address___1b-4O">
+                                    {{ order.recv_addr.address_detailed }}
+                                </div>
+                            </td>
+                            <td>{{ order.demo|default:'无' }}</td>
+                            <td class="text-danger">¥{{ order.cost }}</td>
+                            <td>{{ order.create_time|date:'Y-m-d H:i' }}</td>
+                            <td>
+                                {% if ostatus == '1' %}
+                                    <div>
+                                        <a href="javascript:void(0);" onclick="change_status(this,'接单');">接单</a>
+                                    </div>
+                                {% elif ostatus == '2' %}
+                                    <div>
+                                        <a href="javascript:void(0);" onclick="change_status(this,'取货');">确认取货</a>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <a href="javascript:void(0);" onclick="change_status(this,'删除');">删除订单</a>
+                                </div>
+                                {% if ostatus != '5' %}
+                                    <div>
+                                        <a href="javascript:void(0);" onclick="change_status(this,'取消');">取消订单</a>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted">更新于{{ now|date:'Y-m-d H:i' }}</div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        function change_status(ths, operate) {
+            let oid = $(ths).parent().parent().parent().attr('id');
+            let answer = confirm('确定将订单 ' + oid + ' 进行 ' + operate + ' 操作吗?');
+            if (answer) {
+                $.post(
+                    '{% url "backstage:getOrderInfo" %}',
+                    {"csrfmiddlewaretoken": "{{ csrf_token }}", "oid": oid, "type": operate},
+                    function (data) {
+                        alert(data['msg']);
+                        if (data['status']) {
+                            window.location.reload()
+                        }
+                    }
+                )
+            }
+        }
+        $('#order-manage').removeClass('collapsed');
+        $('#collapseExamplePages').addClass('show');
+    </script>
+{% endblock %}

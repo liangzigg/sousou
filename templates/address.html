@@ -1,0 +1,167 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>地址簿 - 嗖嗖</title>
+{% endblock %}
+
+{% block content %}
+    <script>
+        $(function () {
+            $('a:contains("我的嗖嗖")').parent().addClass('active')
+                .siblings().removeClass('active')
+        })
+    </script>
+    <div class="container">
+        <div class="clearfix">
+            <ol role="navigation" aria-label="breadcrumbs"
+                class="pull-left breadcrumb">
+                <li class="">
+                    <a href="{% url 'index' %}">首页</a>
+                </li>
+                <li class="active">
+                    <span>我的达达</span>
+                </li>
+                <li class="active">
+                    <span>地址簿</span>
+                </li>
+            </ol>
+        </div>
+        <div class="card clearfix SettingsLayout__container___1mSoA">
+            <ul class="settings-nav nav nav-pills nav-stacked">
+                <li role="presentation" class="active">
+                    <a action="push" href="">地址簿</a>
+                </li>
+                <li role="presentation" class="">
+                    <a action="push" href="{% url 'user:wallet' %}">钱包</a>
+                </li>
+            </ul>
+            <div class="SettingsLayout__content___3YcXb">
+                <div>
+                    <ul class="addresses-nav nav nav-pills">
+                        <li role="presentation" class="active">
+                            <a role="button" href="#">发货地址</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a role="button" href="#">收货地址</a>
+                        </li>
+                    </ul>
+                    <div>
+                        <div class="clearfix Action__container___3_PJW">
+                            <div class="pull-left">
+                                <button type="button"
+                                        class="Action__action___3Kkzw btn btn-primary">
+                                    删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="Contacts__table___SJO90 table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" value="on">
+                            </th>
+                            <th class="Contacts__row-name___2-V87">
+                                姓名
+                            </th>
+                            <th class="Contacts__row-phone___7hKgT">
+                                电话
+                            </th>
+                            <th>
+                                地址
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="text-center">
+                            <td colspan="5">暂无地址</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            function get_send_address() {
+                var url = "{% url 'user:address_query' %}";
+                var tbody = $('tbody');
+                $.get(url, {"type": '0' }, function (result) {
+                    tbody.children('tr').remove();
+                    if(result['status'] === '2'){
+                        $(result['address_list']).each(function (i, ele) {
+                            var tr = $('<tr></tr>');
+                            tr.append('<td><input type="checkbox" value="on"></td>');
+                            tr.append('<td>'+ ele.recv_name +'</td>');
+                            tr.append('<td>'+ ele.liaison +'</td>');
+                            tr.append('<td>'+ ele.address_detailed + '</td>');
+                            tbody.append(tr)
+                        })
+                    }else{
+                        tbody.append('<tr class="text-center"><td colspan="5">暂无地址</td></tr>')
+                    }
+                })
+            }
+            function get_recv_address() {
+                var tbody = $('tbody');
+                var url = "{% url 'user:address_query' %}";
+                $.get(url, {"type": '1' }, function (result) {
+                    if(result['status'] === '2'){
+                        tbody.children('tr').remove();
+                        $(result['address_list']).each(function (i, ele) {
+                            var tr = $('<tr></tr>');
+                            tr.append('<td><input type="checkbox" value="on"></td>');
+                            tr.append('<td>'+ ele.recv_name +'</td>');
+                            tr.append('<td>'+ ele.liaison +'</td>');
+                            tr.append('<td>'+ ele.address_detailed + '</td>');
+                            tbody.append(tr)
+                        })
+                    }else{
+                        tbody.append('<tr class="text-center"><td colspan="5">暂无地址</td></tr>')
+                    }
+                })
+            }
+            $('a:contains("收货地址")').click(function () {
+                $(this).parent().addClass('active').siblings().removeClass('active');
+                get_recv_address()
+            });
+            $('a:contains("发货地址")').click(function () {
+                $(this).parent().addClass('active').siblings().removeClass('active');
+                get_send_address()
+            });
+            get_send_address();
+            $('button.Action__action___3Kkzw').click(function () {
+                var td_checked = $('td input:checked');
+                check_list = [];
+                td_checked.each(function (i,ele) {
+                    check_list.push($(this).parent().next().next().next().text());
+                });
+                if (check_list.length !== 0){
+                    $.ajax({
+                        url: '{% url "user:delete_address" %}',
+                        type: 'get',
+                        traditional: true,
+                        data: {'delete_addresses': check_list},
+                        success: function (data) {
+                            if (data['status']){
+                                $('td input:checked').parent().parent().remove()
+                            }else{
+                                alert(data['msg'])
+                            }
+                        }
+                    })
+                }
+            });
+            $('th input').click(function () {
+                var th_input = $(this).get(0).checked;
+                $('td input').each(function (i, ele) {
+                    ele.checked = th_input
+                })
+            });
+        })
+    </script>
+{% endblock %}

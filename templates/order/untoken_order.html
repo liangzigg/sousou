@@ -1,0 +1,29 @@
+{% extends 'order/unpay_order.html' %}
+
+{% block operate %}
+    <p>待取货</p>
+    <p>
+        <button type="button" class="btn btn-primary">取消</button>
+    </p>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('a:contains("待取货")').parent().addClass('active').siblings().removeClass('active');
+            $('button:contains("取消")').click(function () {
+                oid = $(this).parent().parent().parent().attr('id');
+                $.post('{% url "order:untoken_order" %}',
+                    {"csrfmiddlewaretoken": "{{ csrf_token }}", "oid": oid},
+                    function (result) {
+                        if(result['status']){
+                            window.location.reload()
+                        }else{
+                            alert(result['msg'])
+                        }
+                    }
+                )
+            })
+        })
+    </script>
+{% endblock %}

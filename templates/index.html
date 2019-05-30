@@ -1,0 +1,321 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style type="text/css" class="AMap.style">
+        .amap-container img {
+            max-width: none !important;
+            max-height: none !important
+        }
+
+        .amap-layer img {
+            pointer-events: none
+        }
+
+        .amap-logo img {
+            width: 73px !important;
+            height: 20px !important;
+            border: 0;
+            vertical-align: baseline !important
+        }
+
+        .amap-icon img {
+            position: absolute;
+            z-index: -1
+        }
+
+        ul.amap-menu-outer li {
+            cursor: pointer;
+            height: 35px;
+            line-height: 35px;
+            word-break: break-all;
+            padding: 0 10px;
+            font-size: 12px;
+            white-space: nowrap
+        }
+
+        ul.amap-menu-outer li a {
+            text-decoration: none;
+            font-size: 13px;
+            margin: 0 5px;
+            color: #000;
+            padding: 5px 5px
+        }
+
+        ul.amap-menu-outer li:hover {
+            background-color: #f3f3ee
+        }
+
+    </style>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="renderer" content="webkit">
+    {% block head %}
+        <title>嗖嗖</title>
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/banner.css' %}">
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script charset="utf-8" src="{% static 'js/v.js' %}"></script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<h1 class="seowhy">同城速递1小时达，400万配送员为您服务，帮取件，代送件，随时下单，立刻上门</h1>
+<div id="root">
+    <!-- 顶部内容部分 -->
+    <div data-reactroot="">
+        <nav class="Header__navbar___2Oobw navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header">
+                    <div class="navbar-left Header__logo___3MXoH">
+                        <img src="{% static 'images/1.png' %}" alt="logo">
+                    </div>
+                </div>
+                <div>
+                    <ul class="nav navbar-nav acc">
+                        <li role="presentation" class="active">
+                            <a href="/">首页</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a href="{% url 'order:create_order' %}">在线下单</a>
+                        </li>
+                        <li role="presentation" class="">
+                            <a href="{% url 'order:unpay_order' %}">我的订单</a>
+                        </li>
+                        <li class="dropdown">
+                            <a id="user-settings" role="button" class="dropdown-toggle"
+                               aria-haspopup="true" aria-expanded="false" href="#">
+                                我的嗖嗖
+                                <span class="caret"></span>
+                            </a>
+                            <ul role="menu" class="dropdown-menu" aria-labelledby="user-settings">
+                                <li role="presentation" class="">
+                                    <a href="{% url 'user:address' %}" role="menuitem" tabindex="-1">
+                                        地址簿
+                                    </a>
+                                </li>
+                                <li role="presentation" class="">
+                                    <a href="{% url 'user:wallet' %}">钱包</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="">
+                            <a title="帮助中心" href="{% url 'help' %}">帮助中心</a></li>
+                    </ul>
+
+                    <ul class="navbar-right nav navbar-nav">
+                        {% if request.session.username %}  <!-- 判断是否已登录 -->
+                            <li class="Header__user___QdZLA dropdown">
+                                <a id="user-logged" role="button" class="dropdown-toggle" aria-haspopup="true"
+                                   aria-expanded="false" href="#">
+                                    {{ request.session.username }}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul role="menu" class="dropdown-menu" aria-labelledby="user-logged">
+                                    {% if request.session.status == 0 or request.session.status == 1 %}
+                                    <li role="presentation" class="user-menu">
+                                        <a role="menuitem" tabindex="-1" href="{% url 'backstage:index' %}">进入后台</a>
+                                    </li>
+                                    {% endif %}
+                                    <li role="presentation" class="user-menu">
+                                        <a role="menuitem" tabindex="-1" href="{% url 'user:logout' %}">退出</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li role="presentation" class="Header__btn-link___1hoWc">
+                                <a role="button" href="#" data-toggle="modal"
+                                   data-target="#myModal">登录 / 注册</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="modal video-modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        登录 & 注册
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <section>
+                        <div class="modal-body">
+                            <div class="loginf_module">
+                                <div class="module form-module">
+                                    <div class="toggle"><i class="fa fa-times fa-pencil"></i>
+                                        <div class="tooltip">点击切换</div>
+                                    </div>
+                                    <div class="form">
+                                        <h3>登录</h3>
+                                        <form action="#" method="post" id="login" onsubmit="return false">
+                                            <input type="text" name="Username"
+                                                   placeholder="手机号" minlength="11"
+                                                   maxlength="11" required>
+                                            <input type="password" name="Password"
+                                                   placeholder="密码" minlength="6"
+                                                   maxlength="16" required>
+                                            <span id="login-error" style="display: none"></span>
+                                            <input type="submit" value="确定">
+                                        </form>
+                                        <div class="cta"><a href="#">忘记密码?</a></div>
+                                    </div>
+                                    <div class="form">
+                                        <h3>注册</h3>
+                                        <form action="#" method="post" id="register" onsubmit="return false">
+                                            <input type="text" name="Username" placeholder="手机号"
+                                                   required>
+                                            <input type="password" name="Password" placeholder="密码"
+                                                   required>
+                                            <input type="email" name="Email" placeholder="邮箱 用于找回密码"
+                                                   required>
+                                            <span id="register-error" style="display: none"></span>
+                                            <input type="submit" value="注册">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $('.dropdown-toggle').click(function () {
+                if ($(this).parent().hasClass('open')) {
+                    $(this).parent().removeClass('open')
+                } else {
+                    $(this).parent().addClass('open')
+                }
+            });
+            $('.toggle').click(function () {
+                // 选中小图标
+                $(this).children('i').toggleClass('fa-pencil');
+                // 选中表单
+                $('.form').animate({
+                    height: "toggle",
+                    'padding-top': 'toggle',
+                    'padding-bottom': 'toggle',
+                    opacity: "toggle"
+                }, "slow");
+            });
+            $('#login').submit(function () {
+                $('#login-error').css({'display': 'none'});
+                $.post("{% url 'user:login' %}", {
+                    username: $('#login input[name="Username"]').val(),
+                    password: $('#login input[name="Password"]').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function (data) {
+                    if (!data['status']) {
+                        $('#login-error').css({'display': 'inline', 'color': 'red', 'padding': '0 112px'})
+                            .text(data['msg']);
+                    } else {
+                        window.location.href = '{% url "index" %}'
+                    }
+                })
+            });
+            $('#register').submit(function () {
+                $('#register-error').css({'display': 'none'});
+                $.post("{% url 'user:register' %}", {
+                    username: $('#register input[name="Username"]').val(),
+                    password: $('#register input[name="Password"]').val(),
+                    email: $('#register input[name="Email"]').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function (data) {
+                    if (!data['status']) {
+                        $('#register-error')
+                            .css({'display': 'inline', 'color': 'red', 'padding': '0 100px'})
+                            .text(data['msg']);
+                    } else {
+                        $('.form').animate({
+                            height: "toggle",
+                            'padding-top': 'toggle',
+                            'padding-bottom': 'toggle',
+                            opacity: "toggle"
+                        }, "slow");
+                    }
+                })
+            })
+        </script>
+        <!-- 中间内容部分 -->
+        {% block content %}
+            <script>
+                $(function () {
+                    $('a:contains("首页")').parent().addClass('active')
+                        .siblings().removeClass('active')
+                })
+            </script>
+            <div style="height: 758px;">
+                <div class="Home__banner___uWpu-" style="padding-top: 53.06px;">
+                    <div class="Home__title___2Nzrl">帮取件、代送件，百万嗖嗖骑士为您服务</div>
+                    <div class="Home__tip___1NRTS">预计15分钟上门取件、1小时送达</div>
+                    <div>
+                        <div class="Home__intro___1ymJA">
+                            <div class="Home__card___2xgr_">
+                                <div class="Home__padding-y___22pUM">
+                                    <div class="margin-b"><img class="Home__type___1bStU"
+                                                               src="data:image/png;base64,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"><span
+                                            class="Home__icon___3w-dY">首单5折</span></div>
+                                    <div class="Home__text___3zTJl">
+                                        <div>随时下单，上门取件</div>
+                                        <div>按距离收费，7*24小时为您服务</div>
+                                    </div>
+                                    <div class="Home__slogan___OFNsm">
+                                        <a href="{% url 'order:create_order' %}"
+                                           class="Home__btn___GtCPt btn btn-primary">
+                                            立即下单
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+        <!-- 底部内容部分 -->
+        {% block footer %}
+            <div class="Footer__container___3r_Ht">
+                <div class="container">
+                    <div class="media">
+                        <div class="Footer__content___3xo16 media-body">
+                            <div class="Footer__link___1iXgP">
+                                <span>嗖嗖同城速递信息服务平台：</span>
+                                <a href="#" target="_blank" rel="noopener noreferrer">关于我们</a>
+                                <a href="#" target="_blank" rel="noopener noreferrer">常见问题</a>
+                                <div class="Footer__feedback___cIKtn">
+                                    <div class="Feedback__button___3G8M4">意见反馈</div>
+                                </div>
+                                <span>客服专线：1509044128</span></div>
+                            <div class="Footer__copyright___2AaIL">
+                                <span>© 2019 SouSou 王琦科技有限公司版权所有</span>
+                                <span>沪ICP备15090441号-28</span>
+                            </div>
+                            <div class="Footer__address___282V1">
+                                山西省太原市尖草坪区上兰街道学院路3号中北大学
+                            </div>
+                        </div>
+                        <div class="media-right">
+                            <figure class="Footer__barcode___27Hmb">
+                                <img src="{% static 'images/4.png' %}">
+                                <figcaption>关注微信公众号</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-list"></div>
+        {% endblock %}
+    </div>
+</div>
+
+{% block js %}
+    <script>
+    </script>
+{% endblock %}
+
+</body>
+</html>

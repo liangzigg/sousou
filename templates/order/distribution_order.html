@@ -1,0 +1,30 @@
+{% extends 'order/unpay_order.html' %}
+
+{% block operate %}
+    <p>配送中</p>
+    <p>
+        <button type="button" class="btn btn-primary">确认收货</button>
+    </p>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('a:contains("配送中")').parent()
+                .addClass('active').siblings().removeClass('active');
+            $('button:contains("确认收货")').click(function () {
+                oid = $(this).parent().parent().parent().attr('id');
+                $.post('{% url "order:distribution_order" %}',
+                    {"csrfmiddlewaretoken": "{{ csrf_token }}", "oid": oid},
+                    function (result) {
+                        if(result['status']){
+                            window.location.reload()
+                        }else{
+                            alert(result['msg'])
+                        }
+                    }
+                )
+            })
+        })
+    </script>
+{% endblock %}

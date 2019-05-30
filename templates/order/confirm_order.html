@@ -1,0 +1,131 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>确认订单 - 嗖嗖</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="EditOrder__root___2Gidb">
+            <span>请仔细核对订单信息</span>
+            <button class="btn btn-sm btn-outline-primary" onclick="javascript:history.back(-1);">返回修改订单</button>
+        </div><div class="card card-lg">
+        <div class="row">
+            <div class="Abstract__divider___2iMn3 col-xs-6" style="padding-right: 30px;">
+                <dl class="dl-horizontal Abstract__address___3qWSG">
+                    <dt>发货人信息</dt>
+                    <dd>
+                        <span class="Abstract__name___3euVC">{{ data.sender_name }}</span>
+                        <span class="Abstract__phone___2iYMx">{{ data.sender_phone }}</span>
+                    </dd>
+                    <dd>{{ data.sender_address }}</dd>
+                    <dd>{{ data.sender_door }}</dd>
+                    <dt>收货人信息</dt>
+                    <dd>
+                        <span class="Abstract__name___3euVC">{{ data.receiver_name }}</span>
+                        <span class="Abstract__phone___2iYMx">{{ data.receiver_phone }}</span>
+                    </dd>
+                    <dd>{{ data.receiver_address }}</dd>
+                    <dd>{{ data.receiver_door }}</dd>
+                    <dt>取件时间</dt>
+                    <dd>立即取货</dd>
+                </dl>
+            </div>
+            <div class="col-xs-6" style="padding-left: 30px;">
+                <p class="Abstract__summary___1Ok3n">{{ dis|floatformat:1 }}公里 ／ {{ weight }}公斤</p>
+                <dl class="dl-horizontal Abstract__cost___3LcOX">
+                    <dt>基础配送费</dt>
+                    <dd>¥10.00</dd>
+                    <div class="Abstract__dt-line___1bWS0">
+                        <dt>运费金额</dt>
+                        <dd>¥{{ fare|floatformat:2 }}</dd>
+                    </div>
+                </dl>
+                <div class="text-center">
+                    <a href="{% url 'help' %}" target="_blank" rel="noopener noreferrer">《计价规则》</a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="card card-lg">
+            <div class="row">
+                <div class="Checkout__divider___oHQJq col-xs-6" style="padding-right: 30px;">
+                    <dl class="dl-horizontal Checkout__summary___2aJDO">
+                        <dt>运费金额</dt>
+                        <dd>¥{{ fare|floatformat:2 }}</dd>
+                    </dl>
+                    <hr>
+                    <dl class="dl-horizontal Checkout__summary___2aJDO
+                    Checkout__summary-total___1cAeC">
+                        <dt>需支付</dt>
+                        <dd>¥{{ fare|floatformat:2 }}</dd>
+                    </dl>
+                </div>
+                <div class="col-xs-6" style="padding-left: 30px;">
+                    <p>选择支付方式：</p>
+                    <dl class="dl-horizontal Checkout__payment___MVMdz">
+                        <dt>
+                            <div class="radio disabled">
+                                <label title="">
+                                    {% if balance < fare %}
+                                        <input type="radio" name="balance" disabled="" value="on">
+                                        余额支付
+                                        <span class="Checkout__hint___y26lU">
+                                            当前余额不足，请前往钱包充值
+                                        </span>
+                                    {% else %}
+                                        <input type="radio" name="balance" value="on">
+                                        余额支付
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </dt>
+                        <dd>¥{{ balance|floatformat:2 }}</dd>
+                        <dt>
+                            <div class="radio">
+                                <label title="">
+                                    <input type="radio" name="others" checked value="on">
+                                    其他支付（支付宝、微信）</label>
+                            </div>
+                        </dt>
+                        <dd>
+                        </dd>
+                    </dl>
+                    <button type="button" id="submit" class="btn btn-lg btn-primary btn-block">
+                        提交支付
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            $('#submit').click(function () {
+                $.post(
+                    '{% url "order:online_pay" %}',
+                    {"csrfmiddlewaretoken": "{{ csrf_token }}"},
+                    function (data) {
+                        if(data['status']){
+                            window.open(data['msg']);
+                            // 获取支付结果
+                            $.post('{% url "order:check" %}', {"csrfmiddlewaretoken": "{{ csrf_token }}"},
+                                function (result) {
+                                    if(result['status']){
+                                        window.location.href = '{% url "order:unpack_order" %}'
+                                    }else{
+                                        alert(result['msg'])
+                                    }
+                                }
+                            )
+                        }else{
+                            alert(data['msg'])
+                        }
+                    }
+                )
+            })
+        })
+    </script>
+{% endblock %}
