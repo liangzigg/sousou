@@ -12,6 +12,10 @@
         $(function () {
             $('a:contains("配送中")').parent()
                 .addClass('active').siblings().removeClass('active');
+            $('tbody tr td a').each(function () {
+                let href = $(this).attr('id');
+                $(this).attr('href', '{% url "order:order_detail" %}?oid='+href)
+            });
             $('button:contains("确认收货")').click(function () {
                 oid = $(this).parent().parent().parent().attr('id');
                 $.post('{% url "order:distribution_order" %}',

@@ -1,0 +1,127 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    <title>订单详情 - 嗖嗖</title>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=2.0&ak=WoG6rUZUvtVKW0Rp9HOCfoqFTnj76Gra"></script>
+    <style>
+        #allmap {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="clearfix">
+            <ol role="navigation" aria-label="breadcrumbs" class="breadcrumb">
+                <li class="">
+                    <a href="{% url 'index' %}">首页</a>
+                </li>
+                <li class="">
+                    <a href="{% url 'order:unpay_order' %}">我的订单</a>
+                </li>
+                <li class="active">
+                    <span>订单详情</span>
+                </li>
+            </ol>
+        </div>
+        <table class="OrderList__table___3UjSJ table table-bordered">
+            <thead>
+            <tr>
+                <th style="width:145px">订单号</th>
+                <th class="OrderList__row-contact___3Ds33">发货人｜收货人</th>
+                <th>备注</th>
+                <th>支付金额</th>
+                <th style="width: 120px;">嗖嗖骑士</th>
+                <th style="width:127px">下单时间</th>
+                <th style="width: 120px;">状态｜操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr id="{{ order.id }}">
+                <td>
+                    <a id="{{ order.id }}">{{ order.id }}</a>
+                    <div>
+                        <div>嗖嗖</div>
+                        <div></div>
+                    </div>
+                </td>
+                <td class="OrderList__contact___wTzSG">
+                    <div>发货人：{{ order.sender_addr.recv_name }} {{ order.sender_addr.liaison }}</div>
+                    <div class="OrderList__contact-address___1b-4O">
+                        {{ order.sender_addr.address_detailed }}
+                    </div>
+                    <div>收货人：{{ order.recv_addr.recv_name }} {{ order.recv_addr.liaison }}</div>
+                    <div class="OrderList__contact-address___1b-4O">
+                        {{ order.recv_addr.address_detailed }}
+                    </div>
+                </td>
+                <td>{{ order.demo|default:'无' }}</td>
+                <td class="text-danger">¥{{ order.cost }}</td>
+                <td>
+                    <div>{{ order.driver }}</div>
+                </td>
+                <td>{{ order.create_time|date:'Y-m-d H:i' }}</td>
+                <td>
+                    {% block operate %}
+                        <p>配送中</p>
+                        <p>
+                            <button type="button" class="btn btn-primary">确认收货</button>
+                        </p>
+                    {% endblock %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div id="allmap"></div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        var map = new BMap.Map("allmap");
+        map.centerAndZoom(new BMap.Point(parseFloat('{{ order.sender_addr.address_longitude }}'),
+                parseFloat('{{ order.sender_addr.address_latitude }}')), 12);
+        map.enableScrollWheelZoom(true);
+        var navigationControl = new BMap.NavigationControl({
+            // 靠左上角位置
+            anchor: BMAP_ANCHOR_TOP_LEFT,
+            // LARGE类型
+            type: BMAP_NAVIGATION_CONTROL_LARGE,
+            // 启用显示定位
+            enableGeolocation: true
+        });
+        map.addControl(navigationControl);
+
+        function get_location() {
+            var address_data = ['发货地址', '收货地址'];
+
+            var point = []; //存放标注点经纬信息的数组
+            var marker = []; //存放标注点对象的数组
+            point[0] = new BMap.Point(parseFloat('{{ order.sender_addr.address_longitude }}'),
+                parseFloat('{{ order.sender_addr.address_latitude }}')); //循环生成新的地图点
+            marker[0] = new BMap.Marker(point[0]); //按照地图点坐标生成标记
+            map.addOverlay(marker[0]);
+
+            point[1] = new BMap.Point(parseFloat('{{ order.recv_addr.address_longitude }}'),
+                parseFloat('{{ order.recv_addr.address_latitude }}')); //循环生成新的地图点
+            marker[1] = new BMap.Marker(point[1]); //按照地图点坐标生成标记
+            map.addOverlay(marker[1]);
+
+            for (i = 0; i < marker.length; i++) {
+                (function () {
+                    var index = i;
+                    marker[index].addEventListener('click', function () {
+                        this.openInfoWindow(new BMap.InfoWindow(address_data[index]));
+                    });
+                })();
+            }
+
+        }
+        $(function () {
+            get_location()
+        })
+    </script>
+{% endblock %}
